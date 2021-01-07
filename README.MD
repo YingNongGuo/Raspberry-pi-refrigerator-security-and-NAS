@@ -245,11 +245,11 @@ hostname -I
 ```
 
 ## 參考資料
-http://www.pythonforbeginners.com/code-snippets-source-code/using-python-to-send-email
-https://blog.gtwang.org/programming/opencv-motion-detection-and-tracking-tutorial/
-https://www.pyimagesearch.com/2015/12/28/increasing-raspberry-pi-fps-with-python-and-opencv/
-https://pimylifeup.com/raspberry-pi-samba/
-https://www.researchgate.net/figure/Image-convolution-with-an-input-image-of-size-7-7-and-a-filter-kernel-of-size-3-3_fig1_318849314
+http://www.pythonforbeginners.com/code-snippets-source-code/using-python-to-send-email  
+https://blog.gtwang.org/programming/opencv-motion-detection-and-tracking-tutorial/  
+https://www.pyimagesearch.com/2015/12/28/increasing-raspberry-pi-fps-with-python-and-opencv/  
+https://pimylifeup.com/raspberry-pi-samba/  
+https://www.researchgate.net/figure/Image-convolution-with-an-input-image-of-size-7-7-and-a-filter-kernel-of-size-3-3_fig1_318849314  
 
 ## 作者 1091lsa第11組
 郭穎穠、吳辰恩、葉浩堯、許恩瑞
