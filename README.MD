@@ -1,6 +1,5 @@
 # 冰箱監視器與SAMBA
 
-
 # 目的
 1.監測冰箱有無被使用  
 2.偵測到有動作時才錄影,減少錄製影片容量  
@@ -12,7 +11,7 @@
 2.作業系統：Raspberry Pi OS with desktop  
 3.7吋觸控顯示器  
 4.Raspberry Pi Camera Module(CSI傳輸)  
-![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E5%86%B0%E7%AE%B1.jpg)
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E8%A8%AD%E5%82%991.jpg)  
 
 ## python import的library
 argparse  
