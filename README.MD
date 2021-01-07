@@ -250,7 +250,19 @@ sudo systemctl restart smbd
 ```
 hostname -I
 ```
-
+## DEMO
+### 動作偵測
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/ezgif-7-f15707d33f8c.gif)
+---
+### 偵測到有人，寄送警告信件
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/ezgif-7-8407a8f061da.gif)
+---
+### 從手機端連線到NAS
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/ezgif-5-debd3e2dfac3_%E6%89%8B%E6%A9%9F%E9%80%A3%E7%B7%9A.gif)
+---
+### 從電腦端連線到NAS
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/ezgif-5-87c60080fa54_%E9%80%A3%E7%B7%9A%E7%B6%B2%E8%B7%AF%E7%A3%81%E7%A2%9F%E6%A9%9F.gif)
+---
 ## 參考資料
 http://www.pythonforbeginners.com/code-snippets-source-code/using-python-to-send-email  
 https://blog.gtwang.org/programming/opencv-motion-detection-and-tracking-tutorial/  
