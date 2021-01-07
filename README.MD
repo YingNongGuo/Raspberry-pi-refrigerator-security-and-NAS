@@ -2,21 +2,18 @@
 
 
 # 目的
-監測冰箱有無被使用
-偵測到有動作時才錄影,減少錄製影片容量
-寄Email提醒使用者冰箱遭到入侵
-使用SAMBA分享錄影影片
+1.監測冰箱有無被使用  
+2.偵測到有動作時才錄影,減少錄製影片容量  
+3.寄Email提醒使用者冰箱遭到入侵  
+4.使用SAMBA分享錄影影片  
 
 ## 設備簡介
-
-Raspberry Pi 4 
-作業系統：Raspberry Pi OS with desktop
-觸控顯示器
-Raspberry Pi Camera Module(CSI傳輸)
+1.Raspberry Pi 4  
+2.作業系統：Raspberry Pi OS with desktop  
+3.7吋觸控顯示器  
+4.Raspberry Pi Camera Module(CSI傳輸)  
 
 ## 寄送email測試
-寄email的帳號
-收email的帳號
 ```
 import smtplib
 
@@ -31,7 +28,7 @@ def sendemail():
     message = header + message
     server = smtplib.SMTP(smtpserver)
     server.starttls()
-    server.login('linuxlsateam11',password)
+    server.login('寄email的帳號',password)
     problems = server.sendmail(from_addr, to_addr_list, message)
     server.quit()
 
@@ -113,7 +110,7 @@ def sending():
         try:
             smtp.ehlo()  # 驗證SMTP伺服器
             smtp.starttls()  # 建立加密傳輸
-            smtp.login("寄件者",'team11team11')  # 登入寄件者gmail
+            smtp.login("寄件者",'寄件者帳號')  # 登入寄件者gmail
             smtp.send_message(content)  # 寄送郵件
             print("Complete!")
         except Exception as e:
