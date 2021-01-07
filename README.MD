@@ -12,7 +12,7 @@
 2.作業系統：Raspberry Pi OS with desktop  
 3.7吋觸控顯示器  
 4.Raspberry Pi Camera Module(CSI傳輸)  
-
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E5%86%B0%E7%AE%B1.jpg)
 
 ## python import的library
 argparse  
