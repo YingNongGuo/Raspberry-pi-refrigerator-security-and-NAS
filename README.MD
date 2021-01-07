@@ -218,6 +218,9 @@ vs.stop()
 sudo apt-get install samba samba-common-bin
 mkdir /home/pi/shared
 sudo vim /etc/samba/smb.conf
+```
+編輯設定檔
+```
 [網路上的芳鄰的資料夾名稱]
 path = /home/pi/share
 writeable=Yes
