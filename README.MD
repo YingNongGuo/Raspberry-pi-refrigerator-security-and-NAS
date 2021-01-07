@@ -13,6 +13,15 @@
 3.7吋觸控顯示器  
 4.Raspberry Pi Camera Module(CSI傳輸)  
 
+
+## python import的library
+argparse  
+imutils  
+time  
+cv2  
+numpy as np  
+smtplib  
+
 ## 寄送email測試
 ```
 import smtplib
@@ -211,6 +220,7 @@ cv2.destroyAllWindows()
 vs.stop()
 ```
 ## SAMBA
+下載並設定conf檔
 ```
 sudo apt-get install samba samba-common-bin
 mkdir /home/pi/shared
