@@ -224,6 +224,8 @@ cv2.destroyAllWindows()
 vs.stop()
 ```
 ## SAMBA
+### 樹苺派NAS示意圖
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/SAMBA%E7%A4%BA%E6%84%8F%E5%9C%96.png)  
 下載並設定conf檔
 ```
 sudo apt-get install samba samba-common-bin
