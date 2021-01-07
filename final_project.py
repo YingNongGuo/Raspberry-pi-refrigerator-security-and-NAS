@@ -70,7 +70,7 @@ def sending():
         try:
             smtp.ehlo()  # 驗證SMTP伺服器
             smtp.starttls()  # 建立加密傳輸
-            smtp.login("寄件者",'team11team11')  # 登入寄件者gmail
+            smtp.login("寄件者",'寄件者密碼')  # 登入寄件者gmail
             smtp.send_message(content)  # 寄送郵件
             print("Complete!")
         except Exception as e:
