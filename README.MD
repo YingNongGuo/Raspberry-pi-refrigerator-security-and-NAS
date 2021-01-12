@@ -273,6 +273,10 @@ sudo apt install libnginx-mod-rtmp
 sudo vim rtmp.conf
 ```
 ```
+sudo systemctl start nginx
+sudo systemctl status nginx
+```
+```
 sudo apt-get install libomxil-bellagio-dev
 wget -O ffmpeg.tar.bz2 https://ffmpeg.org/releases/ffmpeg-snapshot-git.tar.bz2
 tar xvjf ffmpeg.tar.bz2
@@ -298,6 +302,9 @@ rtmp {
 ```
 apt-get remove --purge nginx nginx-full nginx-common
 apt-get install nginx
+```
+```
+ -flvflags no_duration_filesize
 ```
 ## SAMBA
 ### 樹苺派NAS示意圖
