@@ -19,11 +19,11 @@
 再使用[Etcher](https://www.balena.io/etcher/)燒錄SD卡(建議先將SD卡格式化後再燒錄)
 
 ## 旋轉螢幕與更新軟體和軟體版本
-先安裝文字編輯器
+### 安裝文字編輯器
 ```
 sudo apt install vim
 ```
-若螢幕顛倒,可調整螢幕設定
+### 若螢幕顛倒,可調整螢幕設定
 ```
 sudo vim /boot/config.txt
 ```
@@ -38,7 +38,7 @@ lcd_rotate = 3 //旋轉270度
 ```
 reboot
 ```
-更新軟體和軟體版本
+### 更新軟體和軟體版本
 ```
 sudo apt-get update
 sudo apt-get upgrade
@@ -46,14 +46,6 @@ sudo apt-get upgrade
 
 ## 系統流程圖
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E7%B3%BB%E7%B5%B1%E6%B5%81%E7%A8%8B%E5%9C%96.png)  
-
-## python import的library
-argparse  
-imutils  
-time  
-cv2  
-numpy as np  
-smtplib  
 
 ## 寄送email測試
 
@@ -92,8 +84,8 @@ Interface Options-->camera-->enable ,並重新開機啟用設定
 sudo pip3 install imutils
 sudo pip3 install opencv-python
 sudo apt-get install libatlas-base-dev
+sudo apt-get install gpac
 ```
-
 
 ### 動作偵測流程圖
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E5%8B%95%E4%BD%9C%E5%81%B5%E6%B8%AC%E6%B5%81%E7%A8%8B%E5%9C%96.png)  
@@ -269,6 +261,43 @@ while (1):
 fps.stop()
 cv2.destroyAllWindows()
 vs.stop()
+```
+## Nginx livestream
+```
+sudo apt install nginx
+```
+```
+sudo apt install libnginx-mod-rtmp
+```
+```
+sudo vim rtmp.conf
+```
+```
+sudo apt-get install libomxil-bellagio-dev
+wget -O ffmpeg.tar.bz2 https://ffmpeg.org/releases/ffmpeg-snapshot-git.tar.bz2
+tar xvjf ffmpeg.tar.bz2
+cd ffmpeg
+sudo ./configure --arch=arm --target-os=linux --enable-gpl --enable-omx --enable-omx-rpi --enable-nonfree --extra-ldflags="-latomic"
+```
+## 修改nginx.conf
+```
+sudo vim /etc/nginx/nginx.conf
+```
+```
+rtmp {
+    server {
+        listen 1935;
+        chunk_size 4096;
+        application vod {
+            play /home/pi/share;
+        }
+    }
+}
+```
+## 若nginx.conf消失或改爛,重新安裝一次即可
+```
+apt-get remove --purge nginx nginx-full nginx-common
+apt-get install nginx
 ```
 ## SAMBA
 ### 樹苺派NAS示意圖
