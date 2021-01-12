@@ -13,6 +13,37 @@
 4.Raspberry Pi Camera Module(CSI傳輸)  
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E8%A8%AD%E5%82%991.jpg)  
 
+## 安裝作業系統
+請到官網下載[Raspberry Pi OS with desktop and recommended software](https://www.raspberrypi.org/software/operating-systems/)
+
+再使用[Etcher](https://www.balena.io/etcher/)燒錄SD卡(建議先將SD卡格式化後再燒錄)
+
+## 旋轉螢幕與更新軟體和軟體版本
+先安裝文字編輯器
+```
+sudo apt install vim
+```
+若螢幕顛倒,可調整螢幕設定
+```
+sudo vim /boot/config.txt
+```
+依照需求在最底下加上程式碼
+```
+lcd_rotate = 0 //不旋轉
+lcd_rotate = 1 //旋轉90度
+lcd_rotate = 2 //旋轉180度
+lcd_rotate = 3 //旋轉270度
+```
+若是HDMI螢幕請使用display_rotate指令,重開機之後才會套用設定
+```
+reboot
+```
+更新軟體和軟體版本
+```
+sudo apt-get update
+sudo apt-get upgrade
+```
+
 ## 系統流程圖
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E7%B3%BB%E7%B5%B1%E6%B5%81%E7%A8%8B%E5%9C%96.png)  
 
@@ -25,13 +56,15 @@ numpy as np
 smtplib  
 
 ## 寄送email測試
+
+### 將 Google email 帳戶-->安全性-->低安全性應用程式存取權 開啟
 ```
 import smtplib
 
 def sendemail():
     from_addr='寄email的帳號'
     to_addr_list='收email的帳號'
-    message='Hello'
+    message='Hello'#要傳送的訊息
     password='寄email的密碼'
     smtpserver='smtp.gmail.com:587'
     header  = 'From: %s' % from_addr
@@ -43,11 +76,25 @@ def sendemail():
     problems = server.sendmail(from_addr, to_addr_list, message)
     server.quit()
 
-sendemail()
-
+sendemail()#呼叫函式
 ```
 
 ## 動作偵測
+
+### 開啟pi camera
+```
+sudo raspi-config
+```
+Interface Options-->camera-->enable ,並重新開機啟用設定
+
+### 安裝模組
+```
+sudo pip3 install imutils
+sudo pip3 install opencv-python
+sudo apt-get install libatlas-base-dev
+```
+
+
 ### 動作偵測流程圖
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E5%8B%95%E4%BD%9C%E5%81%B5%E6%B8%AC%E6%B5%81%E7%A8%8B%E5%9C%96.png)  
 ```
