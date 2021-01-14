@@ -262,50 +262,30 @@ fps.stop()
 cv2.destroyAllWindows()
 vs.stop()
 ```
-## Nginx livestream
+## Nginx 
+安裝Nginx
 ```
 sudo apt install nginx
 ```
+開啟並檢查一下Nginx狀態 
 ```
-sudo apt install libnginx-mod-rtmp
+sudo service nginx start
+sudo service nginx status
 ```
+
+新增domain name 
 ```
-sudo vim rtmp.conf
+sudo vim /etc/hosts
 ```
-```
-sudo systemctl start nginx
-sudo systemctl status nginx
-```
-```
-sudo apt-get install libomxil-bellagio-dev
-wget -O ffmpeg.tar.bz2 https://ffmpeg.org/releases/ffmpeg-snapshot-git.tar.bz2
-tar xvjf ffmpeg.tar.bz2
-cd ffmpeg
-sudo ./configure --arch=arm --target-os=linux --enable-gpl --enable-omx --enable-omx-rpi --enable-nonfree --extra-ldflags="-latomic"
-```
-## 修改nginx.conf
-```
-sudo vim /etc/nginx/nginx.conf
+
 ```
 ```
-rtmp {
-    server {
-        listen 1935;
-        chunk_size 4096;
-        application vod {
-            play /home/pi/share;
-        }
-    }
-}
-```
-## 若nginx.conf消失或改爛,重新安裝一次即可
+## 若不小心刪除nginx設定檔(或改爛了),重新安裝一次即可
 ```
 sudo apt-get remove --purge nginx nginx-full nginx-common
 sudo apt-get install nginx
 ```
-```
- -flvflags no_duration_filesize
-```
+
 ## SAMBA
 ### 樹苺派NAS示意圖
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/SAMBA%E7%A4%BA%E6%84%8F%E5%9C%96.png)  
