@@ -1,16 +1,16 @@
 # 冰箱監視器與SAMBA
 
 # 目的
-1.監測冰箱有無被使用  
-2.偵測到有動作時才錄影,減少錄製影片容量  
-3.寄Email提醒使用者冰箱遭到入侵  
-4.使用SAMBA分享錄影影片  
+1. 監測冰箱有無被使用  
+2. 偵測到有動作時才錄影,減少錄製影片容量  
+3. 寄Email提醒使用者冰箱遭到入侵  
+4. 使用SAMBA分享錄影影片  
 
 ## 設備簡介
-1.Raspberry Pi 4  
-2.作業系統：Raspberry Pi OS with desktop  
-3.7吋觸控顯示器  
-4.Raspberry Pi Camera Module(CSI傳輸)  
+1. Raspberry Pi 4  
+2. 作業系統：Raspberry Pi OS with desktop  
+3. 7吋觸控顯示器  
+4. Raspberry Pi Camera Module(CSI傳輸)  
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E8%A8%AD%E5%82%991.jpg)  
 
 ## 安裝作業系統
@@ -363,7 +363,8 @@ http://www.pythonforbeginners.com/code-snippets-source-code/using-python-to-send
 https://blog.gtwang.org/programming/opencv-motion-detection-and-tracking-tutorial/  
 https://www.pyimagesearch.com/2015/12/28/increasing-raspberry-pi-fps-with-python-and-opencv/  
 https://pimylifeup.com/raspberry-pi-samba/  
-https://www.researchgate.net/figure/Image-convolution-with-an-input-image-of-size-7-7-and-a-filter-kernel-of-size-3-3_fig1_318849314  
+https://www.researchgate.net/figure/Image-convolution-with-an-input-image-of-size-7-7-and-a-filter-kernel-of-size-3-3_fig1_318849314
+https://www.raspberrypi.org/forums/viewtopic.php?t=58267
 
 ## 作者 1091lsa第11組
 郭穎穠、吳辰恩、葉浩堯、許恩瑞
