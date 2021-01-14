@@ -114,7 +114,7 @@ sudo apt-get install nginx
 下載並設定conf檔
 ```
 sudo apt-get install samba samba-common-bin
-mkdir /home/pi/shared
+mkdir /home/pi/share
 sudo vim /etc/samba/smb.conf
 ```
 編輯設定檔
@@ -327,7 +327,7 @@ def warmup(avg,avg_float):
     return result,avg,avg_float
 ```
 #### 完整程式碼
-各個函式檢測接成功就可以執行完整程式碼囉!(final_project.py)
+各個函式檢測皆成功就可以執行完整程式碼囉!(final_project.py)
 
 ## DEMO
 ### 動作偵測
