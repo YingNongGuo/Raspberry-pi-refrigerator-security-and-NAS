@@ -277,9 +277,41 @@ sudo service nginx status
 ```
 sudo vim /etc/hosts
 ```
+```
+127.0.0.1	localhost
+::1		localhost ip6-localhost ip6-loopback
+ff02::1		ip6-allnodes
+ff02::2		ip6-allrouters
+127.0.1.1		raspberrypi
+127.0.0.1	LSAteam11.com #新增domain name 
+```
 
 ```
+sudo vim /etc/nginx/sites-available/LSAteam11
 ```
+
+```
+server {
+	listen 8080;#
+	server_name LSAteam11.com;
+	root /var/www/LSAteam11/;
+	index index.html;
+	location / {
+	  try_files $uri =404;
+	}
+}
+```
+```
+sudo ln -s /etc/nginx/sites-available/LSAteam11 /etc/nginx/sites-enabled/
+```
+在/var/www/新增資料夾LSAteam11
+```
+sudo mkdir /var/www/LSAteam11
+```
+```
+sudo cp /var/www/html/index.nginx-debian.html /var/www/LSAteam11/
+```
+
 ## 若不小心刪除nginx設定檔(或改爛了),重新安裝一次即可
 ```
 sudo apt-get remove --purge nginx nginx-full nginx-common
