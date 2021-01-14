@@ -424,5 +424,5 @@ def warmup(avg,avg_float):
 [電路開關教學](https://www.raspberrypi.org/forums/viewtopic.php?t=58267)
 
 ## 作者 1091lsa第11組
-郭穎穠、吳辰恩、葉浩堯、許恩瑞
+郭穎穠、吳辰恩、許恩瑞、葉浩堯
 
