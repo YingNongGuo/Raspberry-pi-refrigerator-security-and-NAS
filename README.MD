@@ -14,7 +14,6 @@
 2. 作業系統：Raspberry Pi OS with desktop  
 3. 7吋觸控顯示器  
 4. Raspberry Pi Camera Module(CSI傳輸,USB的部分只是腳架)
-
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E8%A8%AD%E5%82%991.jpg)  
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E8%A8%AD%E5%82%992.jpg)
 
