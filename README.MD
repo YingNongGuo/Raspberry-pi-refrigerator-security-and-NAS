@@ -49,6 +49,97 @@ sudo apt-get upgrade
 ## 系統流程圖
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E7%B3%BB%E7%B5%B1%E6%B5%81%E7%A8%8B%E5%9C%96.png)  
 
+## Nginx 傳送 
+安裝Nginx
+```
+sudo apt install nginx
+```
+開啟並檢查一下Nginx狀態 
+```
+sudo service nginx start
+sudo service nginx status
+```
+
+新增domain name 
+```
+sudo vim /etc/hosts
+```
+```
+127.0.0.1	localhost
+::1		localhost ip6-localhost ip6-loopback
+ff02::1		ip6-allnodes
+ff02::2		ip6-allrouters
+127.0.1.1		raspberrypi
+127.0.0.1	LSAteam11.com #新增domain name 
+```
+編輯設定檔 
+```
+sudo vim /etc/nginx/sites-available/LSAteam11
+```
+```
+server {
+	listen 8080;#
+	server_name LSAteam11.com;
+	root /var/www/LSAteam11/;
+	index index.html;
+	location / {
+	  try_files $uri =404;
+	}
+}
+```
+```
+sudo ln -s /etc/nginx/sites-available/LSAteam11 /etc/nginx/sites-enabled/
+```
+在/var/www/新增資料夾LSAteam11
+```
+sudo mkdir /var/www/LSAteam11
+```
+```
+sudo cp /var/www/html/index.nginx-debian.html /var/www/LSAteam11/
+```
+重啟nginx(才會重新套用剛才的設定檔)
+```
+sudo service nginx restart
+```
+
+#### 若不小心刪除nginx設定檔(或改爛了),重新安裝一次即可
+```
+sudo apt-get remove --purge nginx nginx-full nginx-common
+sudo apt-get install nginx
+```
+
+## SAMBA
+### 樹苺派NAS示意圖
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/SAMBA%E7%A4%BA%E6%84%8F%E5%9C%96.png)  
+下載並設定conf檔
+```
+sudo apt-get install samba samba-common-bin
+mkdir /home/pi/shared
+sudo vim /etc/samba/smb.conf
+```
+編輯設定檔
+```
+[網路上的芳鄰的資料夾名稱]
+path = /home/pi/share
+writeable=Yes
+create mask=0777
+directory mask=0777
+public=no
+```
+新增使用者
+```
+sudo smbpasswd -a pi
+sudo systemctl restart smbd
+```
+查樹莓派ip
+```
+hostname -I
+```
+如果關機後須重新啟用SAMBA服務,請執行
+```
+sudo service smbd start
+```
+
 ## 硬體與軟體設計
 ### 冰箱門電路設計
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E5%86%B0%E7%AE%B1%E9%96%80%E9%9B%BB%E8%B7%AF1.jpg) 
@@ -237,93 +328,6 @@ def warmup(avg,avg_float):
 ```
 #### 完整程式碼
 各個函式檢測接成功就可以執行完整程式碼囉!(final_project.py)
-
-## Nginx 傳送 
-安裝Nginx
-```
-sudo apt install nginx
-```
-開啟並檢查一下Nginx狀態 
-```
-sudo service nginx start
-sudo service nginx status
-```
-
-新增domain name 
-```
-sudo vim /etc/hosts
-```
-```
-127.0.0.1	localhost
-::1		localhost ip6-localhost ip6-loopback
-ff02::1		ip6-allnodes
-ff02::2		ip6-allrouters
-127.0.1.1		raspberrypi
-127.0.0.1	LSAteam11.com #新增domain name 
-```
-編輯設定檔 
-```
-sudo vim /etc/nginx/sites-available/LSAteam11
-```
-```
-server {
-	listen 8080;#
-	server_name LSAteam11.com;
-	root /var/www/LSAteam11/;
-	index index.html;
-	location / {
-	  try_files $uri =404;
-	}
-}
-```
-```
-sudo ln -s /etc/nginx/sites-available/LSAteam11 /etc/nginx/sites-enabled/
-```
-在/var/www/新增資料夾LSAteam11
-```
-sudo mkdir /var/www/LSAteam11
-```
-```
-sudo cp /var/www/html/index.nginx-debian.html /var/www/LSAteam11/
-```
-
-#### 若不小心刪除nginx設定檔(或改爛了),重新安裝一次即可
-```
-sudo apt-get remove --purge nginx nginx-full nginx-common
-sudo apt-get install nginx
-```
-
-## SAMBA
-### 樹苺派NAS示意圖
-![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/SAMBA%E7%A4%BA%E6%84%8F%E5%9C%96.png)  
-下載並設定conf檔
-```
-sudo apt-get install samba samba-common-bin
-mkdir /home/pi/shared
-sudo vim /etc/samba/smb.conf
-```
-編輯設定檔
-```
-[網路上的芳鄰的資料夾名稱]
-path = /home/pi/share
-writeable=Yes
-create mask=0777
-directory mask=0777
-public=no
-```
-新增使用者
-```
-sudo smbpasswd -a pi
-sudo systemctl restart smbd
-```
-查樹莓派ip
-```
-hostname -I
-```
-如果關機後須重新啟用SAMBA服務,請執行
-```
-sudo service smbd start
-```
 
 ## DEMO
 ### 動作偵測
