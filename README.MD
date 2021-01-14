@@ -104,7 +104,7 @@ sudo cp /var/www/html/index.nginx-debian.html /var/www/LSAteam11/
 sudo service nginx restart
 ```
 #### 開啟無痕模式在網址列輸入檢查是否成功 
-video.mp4為/var/www/LSAteam11目錄下的檔案 
+video.mp4為/var/www/LSAteam11目錄下的檔案  
 10.106.24.219為樹莓派(在終端機輸入hostname -I可查看) 
 ```
 http://10.106.24.219:8080/video.mp4
@@ -158,7 +158,7 @@ hostname -I
 ```
 sudo service smbd start
 ```
-並確定樹莓派ip是否有改變,網路上的芳鄰讀取位置會不同 
+並確定樹莓派ip是否有改變,網路上的芳鄰讀取位置會不同  
 在WIN10的檔案總管-->本機-->電腦(左上角,檔案旁邊)-->連線網路磁碟機-->在資料夾 輸入\\10.106.24.219\share-->輸入帳號密碼  
 
 ## 硬體與軟體設計
@@ -174,10 +174,10 @@ sudo service smbd start
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/Raspberry-GPIO.jpg)
 
 ### 冰箱門檢測程式
-當冰箱門打開時會回傳1,當冰箱門關起時會回傳0
-將PIN22設為上拉電阻(pull up),注意並不是每一PIN腳都適合這麼做,請查閱 樹莓派 4 datasheet! 
-上拉電阻(pull up)意思是連接一個內建的電阻至3.3V,若是下拉電阻(pull down)則表示連接一個內建的電阻至接地 
-我們設定PIN22為上拉電阻(連接一個內建的電阻至3.3V),當冰箱門打開時電路為通路PIN22便可以讀到訊號 
+當冰箱門打開時會回傳1,當冰箱門關起時會回傳0  
+將PIN22設為上拉電阻(pull up),注意並不是每一PIN腳都適合這麼做,請查閱 樹莓派 4 datasheet!  
+上拉電阻(pull up)意思是連接一個內建的電阻至3.3V,若是下拉電阻(pull down)則表示連接一個內建的電阻至接地  
+當冰箱門打開時電路為通路PIN22便可以讀到訊號 
 ``` 
 import RPi.GPIO as GPIO
 def door_test():
@@ -228,7 +228,7 @@ from subprocess import call
 ```
 
 ### 寄送email測試
-#### 將 Google email 帳戶-->安全性-->低安全性應用程式存取權 開啟
+#### 將 Google email 帳戶-->安全性-->低安全性應用程式存取權 開啟  
 [!image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/google%E5%B8%B3%E6%88%B6%E8%A8%AD%E5%AE%9A.png)
 
 ```
