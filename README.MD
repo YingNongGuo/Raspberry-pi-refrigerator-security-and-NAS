@@ -365,7 +365,7 @@ def warmup(avg,avg_float):
 
 #### 完整程式碼
 各個函式檢測皆成功就可以執行完整程式碼囉!  
-{1:190}(code/final_project.py)
+{1:190} (/final_project.py)
 
 ## DEMO
 ### 異物偵測
