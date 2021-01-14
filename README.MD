@@ -72,24 +72,31 @@ else:
 
 #### 將 Google email 帳戶-->安全性-->低安全性應用程式存取權 開啟
 ```
-import smtplib
+def sending():
+    #mes是要寄送的內容
+    mes = time.strftime("Someone Here!!   %Y-%m-%d %H:%M:%S", time.localtime())
+    #讀取樹莓派的IP_address
+    s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8",80))
+    #錄影會存在/var/www/LSAteam11/,將架設的Nginx網站寄送給使用者
+    mes=mes+'\n record:\n http://'+s.getsockname()[0]+':8080/'+ttt+'.mp4'
+    s.close
+    content = MIMEMultipart()  #建立MIMEMultipart物件
+    content["subject"] = "Refrigerator Monitor"  #郵件標題
+    content["from"] = "寄件者Gmail"  #寄件者(寄件者可和收件者相同,可以自己寄給自己喔!)
+    content["to"] = "收件者Gmail" #收件者
+    content.attach(MIMEText(mes))  # 郵件純文字內容
+    content.attach(MIMEImage(Path('img.jpg').read_bytes()))  # 郵件圖片內容
 
-def sendemail():
-    from_addr='寄email的帳號'
-    to_addr_list='收email的帳號'
-    message='Hello'#要傳送的訊息
-    password='寄email的密碼'
-    smtpserver='smtp.gmail.com:587'
-    header  = 'From: %s' % from_addr
-    header += 'To: %s' % ','.join(to_addr_list)
-    message = header + message
-    server = smtplib.SMTP(smtpserver)
-    server.starttls()
-    server.login('寄email的帳號',password)
-    problems = server.sendmail(from_addr, to_addr_list, message)
-    server.quit()
-
-sendemail()#呼叫函式
+    with smtplib.SMTP(host="smtp.gmail.com", port="587") as smtp:  # 設定SMTP伺服器
+        try:
+            smtp.ehlo()  # 驗證SMTP伺服器
+            smtp.starttls()  # 建立加密傳輸
+            smtp.login("寄件者gmail",'密碼')  # 登入寄件者gmail
+            smtp.send_message(content)  # 寄送郵件
+            print("Complete!")
+        except Exception as e:
+            print("Error message: ", e)
 ```
 
 ### 動作偵測
@@ -128,7 +135,9 @@ import time
 import cv2
 import numpy as np
 import smtplib
-import time
+import socket
+import RPi.GPIO as GPIO
+from shutil import copyfile
 from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
 from pathlib import Path
@@ -136,6 +145,7 @@ from picamera import PiCamera
 from time import sleep
 from subprocess import call 
 ```
+
 #### PiVideoStream
 ```
 class PiVideoStream:
@@ -171,6 +181,7 @@ class PiVideoStream:
         self.camera.stop_recording()
         self.camera.stop_preview()
 ```
+
 #### 異物偵測函式
 ```
 def motiondetection(avg,avg_float):
@@ -201,6 +212,7 @@ def motiondetection(avg,avg_float):
     avg = cv2.convertScaleAbs(avg_float)
     return result,avg
 ```
+
 #### h264轉成mp4檔函式
 ```
 def convert(file_h264, file_mp4):
@@ -210,6 +222,7 @@ def convert(file_h264, file_mp4):
     call([command], shell=True)
     print("\r\nRasp_Pi => Video Converted! \r\n")
 ```
+#### 暖機程式,暖機之後接下來異物偵測都會和這些圖的平均做比較
 ```
 def warmup(avg,avg_float):
     area = 320 * 240 
@@ -307,6 +320,11 @@ sudo systemctl restart smbd
 ```
 hostname -I
 ```
+如果關機後須重新啟用SAMBA服務,請執行
+```
+sudo service smbd start
+```
+
 ## DEMO
 ### 動作偵測
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/ezgif-7-f15707d33f8c.gif)
