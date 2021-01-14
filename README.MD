@@ -49,7 +49,7 @@ sudo apt-get upgrade
 ```
 
 ## 系統流程圖
-![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E7%B3%BB%E7%B5%B1%E6%B5%81%E7%A8%8B%E5%9C%96.png)  
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E7%B3%BB%E7%B5%B1%E6%B5%81%E7%A8%8B%E5%9C%96.png)  
 
 ## 架設Nginx server 
 安裝Nginx
@@ -267,7 +267,7 @@ sudo raspi-config
 Interface Options-->camera-->enable ,並重新開機啟用設定
 
 #### 異物偵測流程圖
-[!image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E5%8B%95%E4%BD%9C%E5%81%B5%E6%B8%AC%E6%B5%81%E7%A8%8B%E5%9C%96.png)  
+[!image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E7%95%B0%E7%89%A9%E5%81%B5%E6%B8%AC%E6%B5%81%E7%A8%8B%E5%9C%96.png)  
 
 #### PiVideoStream
 建立PiVideoStream類別(class)
