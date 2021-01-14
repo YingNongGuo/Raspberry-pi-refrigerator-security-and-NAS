@@ -229,7 +229,7 @@ from subprocess import call
 
 ### 寄送email測試
 #### 將 Google email 帳戶-->安全性-->低安全性應用程式存取權 開啟  
-[!image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/google%E5%B8%B3%E6%88%B6%E8%A8%AD%E5%AE%9A.png)
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/google%E5%B8%B3%E6%88%B6%E8%A8%AD%E5%AE%9A.png)
 
 ```
 def sending():
@@ -267,7 +267,7 @@ sudo raspi-config
 Interface Options-->camera-->enable ,並重新開機啟用設定
 
 #### 異物偵測流程圖
-[!image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E7%95%B0%E7%89%A9%E5%81%B5%E6%B8%AC%E6%B5%81%E7%A8%8B%E5%9C%96.png)  
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E7%95%B0%E7%89%A9%E5%81%B5%E6%B8%AC%E6%B5%81%E7%A8%8B%E5%9C%96.png)  
 
 #### PiVideoStream
 建立PiVideoStream類別(class)
@@ -350,6 +350,7 @@ def convert(file_h264, file_mp4):
 
 #### 暖機程式
 暖機10秒之後接下來異物偵測都會和這些圖的平均做比較
+暖機可以使判斷較為穩定
 ```
 def warmup(avg,avg_float):
     area = 320 * 240 
@@ -368,18 +369,38 @@ def warmup(avg,avg_float):
 [final_project.py](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/final_project.py)
 
 ## DEMO
-### 異物偵測
-![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/ezgif-7-f15707d33f8c.gif)
+### 影像異物偵測
+此時單純使用影像異物偵測(不包含冰箱門電路偵測),缺點為若有人只是單純經過或在旁邊跳舞也會開始錄影
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E5%BD%B1%E5%83%8F%E7%95%B0%E7%89%A9%E5%81%B5%E6%B8%AC.gif)
 ---
-### 偵測到有人，寄送警告信件
-![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/ezgif-7-8407a8f061da.gif)
+### 寄送警告信件
+偵測到有人，寄送含有犯人圖片的警告信件(含nginx網址的警告信件請見Nginx測試)
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E5%AF%84%E4%BF%A1%E9%80%9A%E7%9F%A5.gif)
 ---
 ### 從手機端連線到NAS
-![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/ezgif-5-debd3e2dfac3_%E6%89%8B%E6%A9%9F%E9%80%A3%E7%B7%9A.gif)
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E6%89%8B%E6%A9%9F%E9%80%A3%E7%B7%9A.gif)
 ---
 ### 從電腦端連線到NAS
-![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/ezgif-5-87c60080fa54_%E9%80%A3%E7%B7%9A%E7%B6%B2%E8%B7%AF%E7%A3%81%E7%A2%9F%E6%A9%9F.gif)
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E9%80%A3%E7%B7%9A%E7%B6%B2%E8%B7%AF%E7%A3%81%E7%A2%9F%E6%A9%9F.gif)
+[完整SAMBA測試影片](https://youtu.be/LLC7IivuFmc)
 ---
+### 影像異物偵測與電路偵測
+影像異物偵測到有人後必須等冰箱門打開(電路偵測)才會開始錄影,寄信......  
+為甚麼不使用冰箱門的電路偵測就好呢?  
+因為如果只使用冰箱門的電路偵測時  
+假設今天有人偷完東西後不將門關上,這樣攝影機就會持續錄影直到容量不足甚至蓋掉犯人的影像  
+加上影像異物偵測後會將打開的冰箱門也納入暖機時的初始圖片中  
+此時即便冰箱門的電路偵測為開啟,也必須等到有人過來(與初始圖片不同)才會開始下次錄影  
+影像異物偵測與冰箱門的電路偵測可互相補足彼此的缺點!
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E5%BD%B1%E5%83%8F%E7%95%B0%E7%89%A9%E5%81%B5%E6%B8%AC%E8%88%87%E9%9B%BB%E8%B7%AF%E5%81%B5%E6%B8%AC.gif)
+[完整冰箱監視器測試影片](https://youtu.be/5Jg6x3Og7t8)
+---
+### Nginx測試
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/nginx%E6%AA%A2%E6%9F%A5.gif)
+[完整Nginx測試影片](https://youtu.be/4uHv-AFK2I8)
+---
+
+
 ## 參考資料
 [python寄信範例](http://www.pythonforbeginners.com/code-snippets-source-code/using-python-to-send-email)  
 [python異物偵測](https://blog.gtwang.org/programming/opencv-motion-detection-and-tracking-tutorial/)  
