@@ -103,9 +103,9 @@ sudo cp /var/www/html/index.nginx-debian.html /var/www/LSAteam11/
 ```
 sudo service nginx restart
 ```
-#### 開啟無痕模式在網址列輸入檢查是否成功
-video.mp4為/var/www/LSAteam11目錄下的檔案
-10.106.24.219為樹莓派(在終端機輸入hostname -I可查看)
+#### 開啟無痕模式在網址列輸入檢查是否成功 
+video.mp4為/var/www/LSAteam11目錄下的檔案 
+10.106.24.219為樹莓派(在終端機輸入hostname -I可查看) 
 ```
 http://10.106.24.219:8080/video.mp4
 ```
@@ -158,8 +158,8 @@ hostname -I
 ```
 sudo service smbd start
 ```
-並確定樹莓派ip是否有改變,網路上的芳鄰讀取位置會不同
-在WIN10的檔案總管-->本機-->電腦(左上角,檔案旁邊)-->連線網路磁碟機-->在資料夾 輸入\\10.106.24.219\share-->輸入帳號密碼 
+並確定樹莓派ip是否有改變,網路上的芳鄰讀取位置會不同 
+在WIN10的檔案總管-->本機-->電腦(左上角,檔案旁邊)-->連線網路磁碟機-->在資料夾 輸入\\10.106.24.219\share-->輸入帳號密碼  
 
 ## 硬體與軟體設計
 ### 冰箱門電路設計
@@ -175,10 +175,10 @@ sudo service smbd start
 
 ### 冰箱門檢測程式
 當冰箱門打開時會回傳1,當冰箱門關起時會回傳0
-將PIN22設為上拉電阻(pull up),注意並不是每一PIN腳都適合這麼做,請查閱 樹莓派 4 datasheet!
-上拉電阻(pull up)意思是連接一個內建的電阻至3.3V,若是下拉電阻(pull down)則表示連接一個內建的電阻至接地
-我們設定PIN22為上拉電阻(連接一個內建的電阻至3.3V),當冰箱門打開時電路為通路PIN22便可以讀到訊號
-```
+將PIN22設為上拉電阻(pull up),注意並不是每一PIN腳都適合這麼做,請查閱 樹莓派 4 datasheet! 
+上拉電阻(pull up)意思是連接一個內建的電阻至3.3V,若是下拉電阻(pull down)則表示連接一個內建的電阻至接地 
+我們設定PIN22為上拉電阻(連接一個內建的電阻至3.3V),當冰箱門打開時電路為通路PIN22便可以讀到訊號 
+``` 
 import RPi.GPIO as GPIO
 def door_test():
     GPIO.setmode(GPIO.BCM)
@@ -266,8 +266,8 @@ sudo raspi-config
 ```
 Interface Options-->camera-->enable ,並重新開機啟用設定
 
-#### 動作偵測流程圖
-![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E5%8B%95%E4%BD%9C%E5%81%B5%E6%B8%AC%E6%B5%81%E7%A8%8B%E5%9C%96.png)  
+#### 異物偵測流程圖
+[!image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E5%8B%95%E4%BD%9C%E5%81%B5%E6%B8%AC%E6%B5%81%E7%A8%8B%E5%9C%96.png)  
 
 #### PiVideoStream
 建立PiVideoStream類別(class)
@@ -368,7 +368,7 @@ def warmup(avg,avg_float):
 {1:190}(code/final_project.py)
 
 ## DEMO
-### 動作偵測
+### 異物偵測
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/ezgif-7-f15707d33f8c.gif)
 ---
 ### 偵測到有人，寄送警告信件
