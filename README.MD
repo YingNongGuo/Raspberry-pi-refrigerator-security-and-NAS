@@ -11,8 +11,10 @@
 1. Raspberry Pi 4  
 2. 作業系統：Raspberry Pi OS with desktop  
 3. 7吋觸控顯示器  
-4. Raspberry Pi Camera Module(CSI傳輸)  
-![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E8%A8%AD%E5%82%991.jpg)  
+4. Raspberry Pi Camera Module(CSI傳輸)
+
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E8%A8%AD%E5%82%991.jpg)  
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E8%A8%AD%E5%82%992.jpg)
 
 ## 預先準備
 #### 安裝作業系統
@@ -49,7 +51,7 @@ sudo apt-get upgrade
 ## 系統流程圖
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E7%B3%BB%E7%B5%B1%E6%B5%81%E7%A8%8B%E5%9C%96.png)  
 
-## Nginx 傳送 
+## 架設Nginx server 
 安裝Nginx
 ```
 sudo apt install nginx
@@ -59,7 +61,6 @@ sudo apt install nginx
 sudo service nginx start
 sudo service nginx status
 ```
-
 新增domain name 
 ```
 sudo vim /etc/hosts
@@ -72,25 +73,26 @@ ff02::2		ip6-allrouters
 127.0.1.1		raspberrypi
 127.0.0.1	LSAteam11.com #新增domain name 
 ```
-編輯設定檔 
+#### 編輯設定檔 
 ```
 sudo vim /etc/nginx/sites-available/LSAteam11
 ```
 ```
 server {
-	listen 8080;#
+	listen 8080;#聽8080port
 	server_name LSAteam11.com;
-	root /var/www/LSAteam11/;
+	root /var/www/LSAteam11/;#index與等一下錄影影片要存放的位置(mp4可直接用瀏覽器播放,h264需另外安裝編碼器)
 	index index.html;
 	location / {
-	  try_files $uri =404;
+	  try_files $uri =404;#若找不到檔案會顯示404
 	}
 }
 ```
+從sites-available softlink到 sites-enabled
 ```
 sudo ln -s /etc/nginx/sites-available/LSAteam11 /etc/nginx/sites-enabled/
 ```
-在/var/www/新增資料夾LSAteam11
+在/var/www/新增資料夾LSAteam11(等一下錄影影片要存放的位置,也可以放圖片,gif等)
 ```
 sudo mkdir /var/www/LSAteam11
 ```
@@ -101,6 +103,12 @@ sudo cp /var/www/html/index.nginx-debian.html /var/www/LSAteam11/
 ```
 sudo service nginx restart
 ```
+#### 開啟無痕模式在網址列輸入檢查是否成功
+video.mp4為/var/www/LSAteam11目錄下的檔案
+10.106.24.219為樹莓派(在終端機輸入hostname -I可查看)
+```
+http://10.106.24.219:8080/video.mp4
+```
 
 #### 若不小心刪除nginx設定檔(或改爛了),重新安裝一次即可
 ```
@@ -109,17 +117,20 @@ sudo apt-get install nginx
 ```
 
 ## SAMBA
-### 樹苺派NAS示意圖
-![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/SAMBA%E7%A4%BA%E6%84%8F%E5%9C%96.png)  
 下載並設定conf檔
 ```
 sudo apt-get install samba samba-common-bin
+```
+新增分享檔案目錄(等一下將錄影影片存在這裡)
+```
 mkdir /home/pi/share
-sudo vim /etc/samba/smb.conf
 ```
 編輯設定檔
 ```
-[網路上的芳鄰的資料夾名稱]
+sudo vim /etc/samba/smb.conf
+```
+```
+[share]#網路上的芳鄰的資料夾名稱
 path = /home/pi/share
 writeable=Yes
 create mask=0777
@@ -127,8 +138,17 @@ directory mask=0777
 public=no
 ```
 新增使用者
+注意這裡的使用者必須是樹莓派上已經有的user(預設user是pi)
 ```
 sudo smbpasswd -a pi
+sudo systemctl restart smbd
+```
+若想新增樹莓派user輸入
+```
+sudo adduser
+```
+重啟SAMBA讀取設定
+```
 sudo systemctl restart smbd
 ```
 查樹莓派ip
@@ -139,25 +159,37 @@ hostname -I
 ```
 sudo service smbd start
 ```
+並確定樹莓派ip是否有改變,網路上的芳鄰讀取位置會不同
+在WIN10的檔案總管-->本機-->電腦(左上角,檔案旁邊)-->連線網路磁碟機-->在資料夾 輸入\\10.106.24.219\share-->輸入帳號密碼 
 
 ## 硬體與軟體設計
 ### 冰箱門電路設計
-![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E5%86%B0%E7%AE%B1%E9%96%80%E9%9B%BB%E8%B7%AF1.jpg) 
-![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E5%86%B0%E7%AE%B1%E9%96%80%E9%9B%BB%E8%B7%AF2.jpg)
-兩條電線分別連上GPIO22(pin15)與GROUND(pin9)
-![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/Raspberry-GPIO.jpg)
+冰箱的內側兩條分開的電線(麵包版專用單芯線)
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E5%86%B0%E7%AE%B1%E9%96%80%E9%9B%BB%E8%B7%AF1.jpg) 
 
-當冰箱被關上時,電路呈通路
-當冰箱被開啟時,電路會斷開
-python測試程式
+冰箱門上的電線(麵包版專用單芯線)
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E5%86%B0%E7%AE%B1%E9%96%80%E9%9B%BB%E8%B7%AF2.jpg)
+
+兩條電線分別連上GPIO22(pin15)與GROUND(pin9)
+在中間加上一個10K電阻可以保護電路(但因為臨時找不到我們這邊沒有裝上10K電阻)
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/Raspberry-GPIO.jpg)
+
+### 冰箱門檢測程式
+當冰箱門打開時會回傳1,當冰箱門關起時會回傳0
+將PIN22設為上拉電阻(pull up),注意並不是每一PIN腳都適合這麼做,請查閱 樹莓派 4 datasheet!
+上拉電阻(pull up)意思是連接一個內建的電阻至3.3V,若是下拉電阻(pull down)則表示連接一個內建的電阻至接地
+我們設定PIN22為上拉電阻(連接一個內建的電阻至3.3V),當冰箱門打開時電路為通路PIN22便可以讀到訊號
 ```
 import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(22,GPIO.IN,GPIO.PUD_UP)
-if GPIO.input(22):
-    print("door is open")
-else:
-    print("door is closed")
+def door_test():
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(22,GPIO.IN,GPIO.PUD_UP)#將PIN22設為pull up
+    if GPIO.input(22):
+        print("door is open")
+        return 1
+    else:
+        print("door is closed")
+        return 0
 ```
 ### 寄送email測試
 
