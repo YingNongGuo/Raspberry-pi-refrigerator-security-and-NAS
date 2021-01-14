@@ -98,6 +98,7 @@ sudo ln -s /etc/nginx/sites-available/LSAteam11 /etc/nginx/sites-enabled/
 ```
 sudo mkdir /var/www/LSAteam11
 ```
+複製預設的index檔,可自行編輯想要的頁面
 ```
 sudo cp /var/www/html/index.nginx-debian.html /var/www/LSAteam11/
 ```
@@ -144,7 +145,7 @@ public=no
 sudo smbpasswd -a pi
 sudo systemctl restart smbd
 ```
-若想新增樹莓派user輸入
+若想新增樹莓派user,可在終端機輸入
 ```
 sudo adduser
 ```
@@ -165,13 +166,13 @@ sudo service smbd start
 
 ## 硬體與軟體設計
 ### 冰箱門電路設計
-冰箱的內側兩條分開的電線(麵包版專用單芯線)
-![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E5%86%B0%E7%AE%B1%E9%96%80%E9%9B%BB%E8%B7%AF1.jpg) 
-
-冰箱門上的電線(麵包版專用單芯線)
+在冰箱門上設置電線(麵包版專用單芯線)
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E5%86%B0%E7%AE%B1%E9%96%80%E9%9B%BB%E8%B7%AF2.jpg)
 
-兩條電線分別連上GPIO22(pin15)與GROUND(pin9)
+在冰箱內側設置兩條分開的電線(麵包版專用單芯線)
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E5%86%B0%E7%AE%B1%E9%96%80%E9%9B%BB%E8%B7%AF1.jpg) 
+
+兩條電線分別連上GPIO22(pin15)與GROUND(pin9)  
 在中間加上一個10K電阻可以保護電路(但因為臨時找不到我們這邊沒有裝上10K電阻)
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/Raspberry-GPIO.jpg)
 
@@ -261,7 +262,7 @@ def sending():
             print("Error message: ", e)
 ```
 
-### 異物偵測
+### 影像異物偵測
 #### 開啟pi camera
 ```
 sudo raspi-config
@@ -308,12 +309,12 @@ class PiVideoStream:
         self.camera.stop_preview()
 ```
 
-#### 異物偵測函式
+#### 影像異物偵測函式
 ```
 def motiondetection(avg,avg_float):
     blur = cv2.blur(vs.read(), (4, 4))#平滑化
     diff = cv2.absdiff(avg, blur)
-    gray = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)#灰階化
     ret, thresh = cv2.threshold(gray, 25, 255, cv2.THRESH_BINARY)
     kernel = np.ones((5, 5), np.uint8)
     thresh = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=2)
@@ -328,14 +329,14 @@ def motiondetection(avg,avg_float):
         (x, y, w, h) = cv2.boundingRect(c)
         cv2.rectangle(vs.read(), (x, y), (x + w, y + h), (0, 255, 0), 2)
         
-    cv2.drawContours(vs.read(), cnts, -1, (0, 255, 255), 2)
+    cv2.drawContours(vs.read(), cnts, -1, (0, 255, 255), 2)#畫上綠色框框
     cv2.imshow('frame', vs.read())
     if cv2.waitKey(10) & 0xFF == ord('q'):
         fps.update()
         return result,avg
     fps.update()
     cv2.accumulateWeighted(blur, avg_float, 0.01)
-    avg = cv2.convertScaleAbs(avg_float)
+    avg = cv2.convertScaleAbs(avg_float)#更新影像的平均值
     return result,avg
 ```
 
@@ -372,7 +373,7 @@ def warmup(avg,avg_float):
 
 ## DEMO
 ### 影像異物偵測  
-此時單純使用影像異物偵測(不包含冰箱門電路偵測),缺點為若有人只是單純經過或在旁邊跳舞也會開始錄影  
+此時單純使用影像異物偵測(不包含冰箱門電路偵測),缺點為若有人只是單純經過或在旁邊跳舞也會被視為犯人  
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E5%BD%B1%E5%83%8F%E7%95%B0%E7%89%A9%E5%81%B5%E6%B8%AC.gif)
 
 ### 寄送警告信件
@@ -391,7 +392,7 @@ def warmup(avg,avg_float):
 為甚麼不使用冰箱門的電路偵測就好呢?  
 因為如果只使用冰箱門的電路偵測時  
 假設今天有人偷完東西後不將門關上,這樣攝影機就會持續錄影直到容量不足甚至蓋掉犯人的影像  
-加上影像異物偵測後會將打開的冰箱門也納入暖機時的初始圖片中  
+影像異物偵測後會將打開的冰箱門也納入暖機時的初始圖片中  
 此時即便冰箱門的電路偵測為開啟,也必須等到有人過來(與初始圖片不同)才會開始下次錄影  
 影像異物偵測與冰箱門的電路偵測可互相補足彼此的缺點!  
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/%E5%BD%B1%E5%83%8F%E7%95%B0%E7%89%A9%E5%81%B5%E6%B8%AC%E8%88%87%E9%9B%BB%E8%B7%AF%E5%81%B5%E6%B8%AC.gif)  
