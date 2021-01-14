@@ -13,7 +13,9 @@ import time
 import cv2
 import numpy as np
 import smtplib
-import time
+import socket
+import RPi.GPIO as GPIO
+from shutil import copyfile
 from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
 from pathlib import Path
@@ -21,13 +23,23 @@ from picamera import PiCamera
 from time import sleep
 from subprocess import call 
 
+def door_test():
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(22,GPIO.IN,GPIO.PUD_UP)
+    if GPIO.input(22):
+        print("door is open")
+        return 1
+    else:
+        print("door is closed")
+        return 0
+        
 def convert(file_h264, file_mp4):
     print("Rasp_Pi => Video Recorded! \r\n")
     # Convert the h264 format to the mp4 format.
     command = "MP4Box -add " + file_h264 + " " + file_mp4
     call([command], shell=True)
     print("\r\nRasp_Pi => Video Converted! \r\n")
-
+    
 def motiondetection(avg,avg_float):
     blur = cv2.blur(vs.read(), (4, 4))
     diff = cv2.absdiff(avg, blur)
@@ -57,12 +69,18 @@ def motiondetection(avg,avg_float):
     return result,avg
 
 def sending():
-    mes = time.strftime("Someone Here!!   %Y-%m-%d %H:%M:%S", time.localtime()) 
-
+    #mes是要寄送的內容
+    mes = time.strftime("Someone Here!!   %Y-%m-%d %H:%M:%S", time.localtime())
+    #讀取樹莓派的IP_address
+    s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8",80))
+    #錄影會存在/var/www/LSAteam11/,將架設的Nginx網站寄送給使用者
+    mes=mes+'\n record:\n http://'+s.getsockname()[0]+':8080/'+ttt+'.mp4'
+    s.close
     content = MIMEMultipart()  #建立MIMEMultipart物件
     content["subject"] = "Refrigerator Monitor"  #郵件標題
-    content["from"] = "寄件者"  #寄件者
-    content["to"] = "收件者" #收件者
+    content["from"] = "寄件者Gmail"  #寄件者(寄件者可和收件者相同,可以自己寄給自己喔!)
+    content["to"] = "收件者Gmail" #收件者
     content.attach(MIMEText(mes))  # 郵件純文字內容
     content.attach(MIMEImage(Path('img.jpg').read_bytes()))  # 郵件圖片內容
 
@@ -70,7 +88,7 @@ def sending():
         try:
             smtp.ehlo()  # 驗證SMTP伺服器
             smtp.starttls()  # 建立加密傳輸
-            smtp.login("寄件者",'寄件者密碼')  # 登入寄件者gmail
+            smtp.login("寄件者gmail",'密碼')  # 登入寄件者gmail
             smtp.send_message(content)  # 寄送郵件
             print("Complete!")
         except Exception as e:
@@ -81,7 +99,7 @@ def warmup(avg,avg_float):
     avg = cv2.blur(vs.read(), (4, 4))
     avg_float = np.float32(avg)
     tstart=time.time()
-    while((time.time()-tstart)<10):
+    while((time.time()-tstart)<3):
         print("warming up")
         print(time.time()-tstart)
         result,avg=motiondetection(avg,avg_float)
@@ -152,15 +170,16 @@ while (1):
     else:
         print("No motion")
   
-    if test>15:
+    if test>15 and door_test():
         frame=vs.read()
         cv2.imwrite('img.jpg',frame)
-        sending()
         print("sendemail")
         vs.record()
         ttt = time.strftime("%Y%m%d%H%M%S", time.localtime())
         mp4 = '/home/pi/share/record'+ttt+'.mp4'
         convert('/home/pi/pi_record/video.h264', mp4)
+        copyfile(mp4,'/var/www/LSAteam11/'+ttt+'.mp4')
+        sending()
         test=0
         result,avg,avg_float=warmup(avg,avg_float)
         
@@ -169,3 +188,4 @@ while (1):
 fps.stop()
 cv2.destroyAllWindows()
 vs.stop()
+
