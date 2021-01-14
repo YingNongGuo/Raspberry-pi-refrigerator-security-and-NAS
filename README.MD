@@ -109,7 +109,6 @@ video.mp4為/var/www/LSAteam11目錄下的檔案
 ```
 http://10.106.24.219:8080/video.mp4
 ```
-
 #### 若不小心刪除nginx設定檔(或改爛了),重新安裝一次即可
 ```
 sudo apt-get remove --purge nginx nginx-full nginx-common
@@ -191,9 +190,47 @@ def door_test():
         print("door is closed")
         return 0
 ```
-### 寄送email測試
 
+### python的module與library準備
+安裝python使用的模組
+```
+sudo pip3 install imutils
+sudo pip3 install opencv-python
+sudo apt-get install libatlas-base-dev
+sudo apt-get install gpac
+```
+python import的library
+```
+from __future__ import print_function
+from imutils.video.pivideostream import PiVideoStream
+from imutils.video import FPS
+from picamera.array import PiRGBArray
+from picamera import PiCamera
+from threading import Thread
+from time import sleep
+from email.mime.text import MIMEText
+from email.header import Header
+import argparse
+import imutils
+import time
+import cv2
+import numpy as np
+import smtplib
+import socket
+import RPi.GPIO as GPIO
+from shutil import copyfile
+from email.mime.multipart import MIMEMultipart
+from email.mime.image import MIMEImage
+from pathlib import Path
+from picamera import PiCamera
+from time import sleep
+from subprocess import call 
+```
+
+### 寄送email測試
 #### 將 Google email 帳戶-->安全性-->低安全性應用程式存取權 開啟
+[!image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/README/Pictures/google%E5%B8%B3%E6%88%B6%E8%A8%AD%E5%AE%9A.png)
+
 ```
 def sending():
     #mes是要寄送的內容
@@ -222,54 +259,18 @@ def sending():
             print("Error message: ", e)
 ```
 
-### 動作偵測
-
+### 異物偵測
 #### 開啟pi camera
 ```
 sudo raspi-config
 ```
 Interface Options-->camera-->enable ,並重新開機啟用設定
 
-#### 安裝模組
-```
-sudo pip3 install imutils
-sudo pip3 install opencv-python
-sudo apt-get install libatlas-base-dev
-sudo apt-get install gpac
-```
-
 #### 動作偵測流程圖
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E5%8B%95%E4%BD%9C%E5%81%B5%E6%B8%AC%E6%B5%81%E7%A8%8B%E5%9C%96.png)  
 
-#### import
-```
-from __future__ import print_function
-from imutils.video.pivideostream import PiVideoStream
-from imutils.video import FPS
-from picamera.array import PiRGBArray
-from picamera import PiCamera
-from threading import Thread
-from time import sleep
-from email.mime.text import MIMEText
-from email.header import Header
-import argparse
-import imutils
-import time
-import cv2
-import numpy as np
-import smtplib
-import socket
-import RPi.GPIO as GPIO
-from shutil import copyfile
-from email.mime.multipart import MIMEMultipart
-from email.mime.image import MIMEImage
-from pathlib import Path
-from picamera import PiCamera
-from time import sleep
-from subprocess import call 
-```
-
 #### PiVideoStream
+建立PiVideoStream類別(class)
 ```
 class PiVideoStream:
     def __init__(self, resolution=(320, 240), framerate=32):
@@ -280,10 +281,10 @@ class PiVideoStream:
         self.stream = self.camera.capture_continuous(self.rawCapture,format="bgr", use_video_port=True)
         self.frame = None
         self.stopped = False
-    def start(self):
+    def start(self):#開始影像串流(stream)
         Thread(target=self.update, args=()).start()
         return self
-    def update(self):
+    def update(self):#更新視窗影像
         for f in self.stream:
             self.frame = f.array
             self.rawCapture.truncate(0)
@@ -292,12 +293,12 @@ class PiVideoStream:
                 self.rawCapture.close()
                 self.camera.close()
                 return
-    def read(self):
+    def read(self):#讀取一幀(frame)
         return self.frame
-    def stop(self):
+    def stop(self):#結束影像串流(stream)
         self.stopped = True
         
-    def record(self):
+    def record(self):#錄下影像串流(stream)
         self.camera.start_preview()
         self.camera.start_recording('/home/pi/pi_record/video.h264')
         sleep(5)
@@ -308,7 +309,7 @@ class PiVideoStream:
 #### 異物偵測函式
 ```
 def motiondetection(avg,avg_float):
-    blur = cv2.blur(vs.read(), (4, 4))
+    blur = cv2.blur(vs.read(), (4, 4))#平滑化
     diff = cv2.absdiff(avg, blur)
     gray = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
     ret, thresh = cv2.threshold(gray, 25, 255, cv2.THRESH_BINARY)
@@ -337,6 +338,7 @@ def motiondetection(avg,avg_float):
 ```
 
 #### h264轉成mp4檔函式
+Pi camera預設為h264,將其轉為mp4方便觀看
 ```
 def convert(file_h264, file_mp4):
     print("Rasp_Pi => Video Recorded! \r\n")
@@ -345,21 +347,25 @@ def convert(file_h264, file_mp4):
     call([command], shell=True)
     print("\r\nRasp_Pi => Video Converted! \r\n")
 ```
-#### 暖機程式,暖機之後接下來異物偵測都會和這些圖的平均做比較
+
+#### 暖機程式
+暖機10秒之後接下來異物偵測都會和這些圖的平均做比較
 ```
 def warmup(avg,avg_float):
     area = 320 * 240 
     avg = cv2.blur(vs.read(), (4, 4))
     avg_float = np.float32(avg)
     tstart=time.time()
-    while((time.time()-tstart)<10):
+    while((time.time()-tstart)<10):#暖機10秒
         print("warming up")
         print(time.time()-tstart)
         result,avg=motiondetection(avg,avg_float)
     return result,avg,avg_float
 ```
+
 #### 完整程式碼
-各個函式檢測皆成功就可以執行完整程式碼囉!(final_project.py)
+各個函式檢測皆成功就可以執行完整程式碼囉!
+{1:190}(code/final_project.py)
 
 ## DEMO
 ### 動作偵測
@@ -380,7 +386,7 @@ def warmup(avg,avg_float):
 [pi camera硬體加速](https://www.pyimagesearch.com/2015/12/28/increasing-raspberry-pi-fps-with-python-and-opencv/)  
 [pi SAMA教學](https://pimylifeup.com/raspberry-pi-samba/)  
 [影像處理教學](https://www.researchgate.net/figure/Image-convolution-with-an-input-image-of-size-7-7-and-a-filter-kernel-of-size-3-3_fig1_318849314)
-[電路教學](https://www.raspberrypi.org/forums/viewtopic.php?t=58267)
+[電路開關教學](https://www.raspberrypi.org/forums/viewtopic.php?t=58267)
 
 ## 作者 1091lsa第11組
 郭穎穠、吳辰恩、葉浩堯、許恩瑞
