@@ -1,10 +1,11 @@
 # 冰箱監視器與SAMBA
 
-# 目的
-1. 監測冰箱有無被使用  
-2. 偵測到有動作時才錄影,減少錄製影片容量  
-3. 寄Email提醒使用者冰箱遭到入侵  
-4. 使用SAMBA分享錄影影片  
+## 目的
+1. 監測冰箱有無被使用
+2. 使用電路偵測冰箱有無被開啟
+3. 偵測到冰箱開啟後如有動作時才錄影,減少錄製影片容量  
+4. 寄Email提醒使用者冰箱遭到入侵  
+5. 使用SAMBA/Nginx分享錄影影片  
 
 ## 設備簡介
 1. Raspberry Pi 4  
@@ -13,17 +14,18 @@
 4. Raspberry Pi Camera Module(CSI傳輸)  
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E8%A8%AD%E5%82%991.jpg)  
 
-## 安裝作業系統
+## 預先準備
+#### 安裝作業系統
 請到官網下載[Raspberry Pi OS with desktop and recommended software](https://www.raspberrypi.org/software/operating-systems/)
 
 再使用[Etcher](https://www.balena.io/etcher/)燒錄SD卡(建議先將SD卡格式化後再燒錄)
 
-## 旋轉螢幕與更新軟體和軟體版本
-### 安裝文字編輯器
+#### 安裝文字編輯器
+可使用預設nano,依個人喜好決定是否安裝vim
 ```
 sudo apt install vim
 ```
-### 若螢幕顛倒,可調整螢幕設定
+#### 若螢幕顛倒,可調整螢幕設定
 ```
 sudo vim /boot/config.txt
 ```
@@ -38,7 +40,7 @@ lcd_rotate = 3 //旋轉270度
 ```
 reboot
 ```
-### 更新軟體和軟體版本
+#### 更新軟體和軟體版本
 ```
 sudo apt-get update
 sudo apt-get upgrade
@@ -47,9 +49,28 @@ sudo apt-get upgrade
 ## 系統流程圖
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E7%B3%BB%E7%B5%B1%E6%B5%81%E7%A8%8B%E5%9C%96.png)  
 
-## 寄送email測試
+## 硬體與軟體設計
+### 冰箱門電路設計
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E5%86%B0%E7%AE%B1%E9%96%80%E9%9B%BB%E8%B7%AF1.jpg) 
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E5%86%B0%E7%AE%B1%E9%96%80%E9%9B%BB%E8%B7%AF2.jpg)
+兩條電線分別連上GPIO22(pin15)與GROUND(pin9)
+![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/Raspberry-GPIO.jpg)
 
-### 將 Google email 帳戶-->安全性-->低安全性應用程式存取權 開啟
+當冰箱被關上時,電路呈通路
+當冰箱被開啟時,電路會斷開
+python測試程式
+```
+import RPi.GPIO as GPIO
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(22,GPIO.IN,GPIO.PUD_UP)
+if GPIO.input(22):
+    print("door is open")
+else:
+    print("door is closed")
+```
+### 寄送email測試
+
+#### 將 Google email 帳戶-->安全性-->低安全性應用程式存取權 開啟
 ```
 import smtplib
 
@@ -71,15 +92,15 @@ def sendemail():
 sendemail()#呼叫函式
 ```
 
-## 動作偵測
+### 動作偵測
 
-### 開啟pi camera
+#### 開啟pi camera
 ```
 sudo raspi-config
 ```
 Interface Options-->camera-->enable ,並重新開機啟用設定
 
-### 安裝模組
+#### 安裝模組
 ```
 sudo pip3 install imutils
 sudo pip3 install opencv-python
@@ -87,8 +108,10 @@ sudo apt-get install libatlas-base-dev
 sudo apt-get install gpac
 ```
 
-### 動作偵測流程圖
+#### 動作偵測流程圖
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/%E5%8B%95%E4%BD%9C%E5%81%B5%E6%B8%AC%E6%B5%81%E7%A8%8B%E5%9C%96.png)  
+
+#### import
 ```
 from __future__ import print_function
 from imutils.video.pivideostream import PiVideoStream
@@ -112,13 +135,17 @@ from pathlib import Path
 from picamera import PiCamera
 from time import sleep
 from subprocess import call 
-
+```
+#### h264轉成mp4檔函式
+```
 def convert(file_h264, file_mp4):
     print("Rasp_Pi => Video Recorded! \r\n")
     # Convert the h264 format to the mp4 format.
     command = "MP4Box -add " + file_h264 + " " + file_mp4
     call([command], shell=True)
     print("\r\nRasp_Pi => Video Converted! \r\n")
+```
+```
 
 def motiondetection(avg,avg_float):
     blur = cv2.blur(vs.read(), (4, 4))
