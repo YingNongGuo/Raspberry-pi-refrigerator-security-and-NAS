@@ -136,76 +136,8 @@ from picamera import PiCamera
 from time import sleep
 from subprocess import call 
 ```
-#### h264轉成mp4檔函式
+#### PiVideoStream
 ```
-def convert(file_h264, file_mp4):
-    print("Rasp_Pi => Video Recorded! \r\n")
-    # Convert the h264 format to the mp4 format.
-    command = "MP4Box -add " + file_h264 + " " + file_mp4
-    call([command], shell=True)
-    print("\r\nRasp_Pi => Video Converted! \r\n")
-```
-```
-
-def motiondetection(avg,avg_float):
-    blur = cv2.blur(vs.read(), (4, 4))
-    diff = cv2.absdiff(avg, blur)
-    gray = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
-    ret, thresh = cv2.threshold(gray, 25, 255, cv2.THRESH_BINARY)
-    kernel = np.ones((5, 5), np.uint8)
-    thresh = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=2)
-    thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel, iterations=2)
-    cnts,hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    result='NO'
-    img=0
-    for c in cnts:
-        if cv2.contourArea(c) < 2500:
-            continue
-        result='Yes'
-        (x, y, w, h) = cv2.boundingRect(c)
-        cv2.rectangle(vs.read(), (x, y), (x + w, y + h), (0, 255, 0), 2)
-        
-    cv2.drawContours(vs.read(), cnts, -1, (0, 255, 255), 2)
-    cv2.imshow('frame', vs.read())
-    if cv2.waitKey(10) & 0xFF == ord('q'):
-        fps.update()
-        return result,avg
-    fps.update()
-    cv2.accumulateWeighted(blur, avg_float, 0.01)
-    avg = cv2.convertScaleAbs(avg_float)
-    return result,avg
-
-def sending():
-    mes = time.strftime("Someone Here!!   %Y-%m-%d %H:%M:%S", time.localtime()) 
-
-    content = MIMEMultipart()  #建立MIMEMultipart物件
-    content["subject"] = "Refrigerator Monitor"  #郵件標題
-    content["from"] = "寄件者"  #寄件者
-    content["to"] = "收件者" #收件者
-    content.attach(MIMEText(mes))  # 郵件純文字內容
-    content.attach(MIMEImage(Path('img.jpg').read_bytes()))  # 郵件圖片內容
-
-    with smtplib.SMTP(host="smtp.gmail.com", port="587") as smtp:  # 設定SMTP伺服器
-        try:
-            smtp.ehlo()  # 驗證SMTP伺服器
-            smtp.starttls()  # 建立加密傳輸
-            smtp.login("寄件者",'密碼')  # 登入寄件者gmail
-            smtp.send_message(content)  # 寄送郵件
-            print("Complete!")
-        except Exception as e:
-            print("Error message: ", e)
-        
-def warmup(avg,avg_float):
-    area = 320 * 240 
-    avg = cv2.blur(vs.read(), (4, 4))
-    avg_float = np.float32(avg)
-    tstart=time.time()
-    while((time.time()-tstart)<10):
-        print("warming up")
-        print(time.time()-tstart)
-        result,avg=motiondetection(avg,avg_float)
-    return result,avg,avg_float
-
 class PiVideoStream:
     def __init__(self, resolution=(320, 240), framerate=32):
         self.camera = PiCamera()
@@ -238,58 +170,62 @@ class PiVideoStream:
         sleep(5)
         self.camera.stop_recording()
         self.camera.stop_preview()
-        
-        
-ap = argparse.ArgumentParser()
-ap.add_argument("-n", "--num-frames", type=int, default=100,help="# of frames to loop over for FPS test")
-ap.add_argument("-d", "--display", type=int, default=-1,help="Whether or not frames should be displayed")
-args = vars(ap.parse_args())
-
-vs = PiVideoStream().start()
-time.sleep(2.0)
-fps = FPS().start()
-
-frame = vs.read()
-area = 320 * 240
-avg = cv2.blur(frame, (4, 4))
-avg_float = np.float32(avg)
-
-result,avg,avg_float=warmup(avg,avg_float)
-lastresult='NO'
-test=0
-
-while (1):
-    lastresult=result
-    result,avg=motiondetection(avg,avg_float)
-    if result=='Yes' and lastresult=='Yes':
-        test=test+1
-    else:
-        test=0
-    if result=='Yes':
-        print("detect motion")
-        print(test)
-    else:
-        print("No motion")
-  
-    if test>15:
-        frame=vs.read()
-        cv2.imwrite('img.jpg',frame)
-        sending()
-        print("sendemail")
-        vs.record()
-        ttt = time.strftime("%Y%m%d%H%M%S", time.localtime())
-        mp4 = '/home/pi/share/record'+ttt+'.mp4'
-        convert('/home/pi/pi_record/video.h264', mp4)
-        test=0
-        result,avg,avg_float=warmup(avg,avg_float)
-        
-    else:
-        result,avg=motiondetection(avg,avg_float)
-fps.stop()
-cv2.destroyAllWindows()
-vs.stop()
 ```
-## Nginx 
+#### 異物偵測函式
+```
+def motiondetection(avg,avg_float):
+    blur = cv2.blur(vs.read(), (4, 4))
+    diff = cv2.absdiff(avg, blur)
+    gray = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
+    ret, thresh = cv2.threshold(gray, 25, 255, cv2.THRESH_BINARY)
+    kernel = np.ones((5, 5), np.uint8)
+    thresh = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=2)
+    thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel, iterations=2)
+    cnts,hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    result='NO'
+    img=0
+    for c in cnts:
+        if cv2.contourArea(c) < 2500:
+            continue
+        result='Yes'
+        (x, y, w, h) = cv2.boundingRect(c)
+        cv2.rectangle(vs.read(), (x, y), (x + w, y + h), (0, 255, 0), 2)
+        
+    cv2.drawContours(vs.read(), cnts, -1, (0, 255, 255), 2)
+    cv2.imshow('frame', vs.read())
+    if cv2.waitKey(10) & 0xFF == ord('q'):
+        fps.update()
+        return result,avg
+    fps.update()
+    cv2.accumulateWeighted(blur, avg_float, 0.01)
+    avg = cv2.convertScaleAbs(avg_float)
+    return result,avg
+```
+#### h264轉成mp4檔函式
+```
+def convert(file_h264, file_mp4):
+    print("Rasp_Pi => Video Recorded! \r\n")
+    # Convert the h264 format to the mp4 format.
+    command = "MP4Box -add " + file_h264 + " " + file_mp4
+    call([command], shell=True)
+    print("\r\nRasp_Pi => Video Converted! \r\n")
+```
+```
+def warmup(avg,avg_float):
+    area = 320 * 240 
+    avg = cv2.blur(vs.read(), (4, 4))
+    avg_float = np.float32(avg)
+    tstart=time.time()
+    while((time.time()-tstart)<10):
+        print("warming up")
+        print(time.time()-tstart)
+        result,avg=motiondetection(avg,avg_float)
+    return result,avg,avg_float
+```
+#### 完整程式碼
+各個函式檢測接成功就可以執行完整程式碼囉!(final_project.py)
+
+## Nginx 傳送 
 安裝Nginx
 ```
 sudo apt install nginx
@@ -312,11 +248,10 @@ ff02::2		ip6-allrouters
 127.0.1.1		raspberrypi
 127.0.0.1	LSAteam11.com #新增domain name 
 ```
-
+編輯設定檔 
 ```
 sudo vim /etc/nginx/sites-available/LSAteam11
 ```
-
 ```
 server {
 	listen 8080;#
@@ -339,7 +274,7 @@ sudo mkdir /var/www/LSAteam11
 sudo cp /var/www/html/index.nginx-debian.html /var/www/LSAteam11/
 ```
 
-## 若不小心刪除nginx設定檔(或改爛了),重新安裝一次即可
+#### 若不小心刪除nginx設定檔(或改爛了),重新安裝一次即可
 ```
 sudo apt-get remove --purge nginx nginx-full nginx-common
 sudo apt-get install nginx
@@ -386,12 +321,12 @@ hostname -I
 ![image](https://github.com/YingNongGuo/Raspberry-pi-refrigerator-security-and-NAS/blob/main/ezgif-5-87c60080fa54_%E9%80%A3%E7%B7%9A%E7%B6%B2%E8%B7%AF%E7%A3%81%E7%A2%9F%E6%A9%9F.gif)
 ---
 ## 參考資料
-http://www.pythonforbeginners.com/code-snippets-source-code/using-python-to-send-email  
-https://blog.gtwang.org/programming/opencv-motion-detection-and-tracking-tutorial/  
-https://www.pyimagesearch.com/2015/12/28/increasing-raspberry-pi-fps-with-python-and-opencv/  
-https://pimylifeup.com/raspberry-pi-samba/  
-https://www.researchgate.net/figure/Image-convolution-with-an-input-image-of-size-7-7-and-a-filter-kernel-of-size-3-3_fig1_318849314
-https://www.raspberrypi.org/forums/viewtopic.php?t=58267
+[python寄信範例](http://www.pythonforbeginners.com/code-snippets-source-code/using-python-to-send-email)  
+[python異物偵測](https://blog.gtwang.org/programming/opencv-motion-detection-and-tracking-tutorial/)  
+[pi camera硬體加速](https://www.pyimagesearch.com/2015/12/28/increasing-raspberry-pi-fps-with-python-and-opencv/)  
+[pi SAMA教學](https://pimylifeup.com/raspberry-pi-samba/)  
+[影像處理教學](https://www.researchgate.net/figure/Image-convolution-with-an-input-image-of-size-7-7-and-a-filter-kernel-of-size-3-3_fig1_318849314)
+[電路教學](https://www.raspberrypi.org/forums/viewtopic.php?t=58267)
 
 ## 作者 1091lsa第11組
 郭穎穠、吳辰恩、葉浩堯、許恩瑞
